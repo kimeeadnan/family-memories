@@ -59,7 +59,14 @@ function normalizePlainEnv(value: string | undefined): string {
   ) {
     s = s.slice(1, -1).trim();
   }
-  return s.replace(/\r\n/g, "\n").trim();
+  // Vercel env values can include hidden newlines/spaces; normalize aggressively
+  s = s.replace(/\u200b/g, ""); // zero-width space
+  s = s.replace(/\r\n/g, "\n");
+  s = s.replace(/\r/g, "");
+  s = s.replace(/\n/g, "");
+  // For numeric/code-style passwords, remove any remaining whitespace
+  s = s.replace(/\s/g, "");
+  return s.trim();
 }
 
 function plainPasswordMatches(
@@ -72,7 +79,7 @@ function plainPasswordMatches(
 
 function plainMatchesInput(input: string, expected: string): boolean {
   if (expected === "") return false;
-  const got = input.trim();
+  const got = input.trim().replace(/\s/g, "");
   const a = Buffer.from(got, "utf8");
   const b = Buffer.from(expected, "utf8");
   if (a.length !== b.length) return false;
