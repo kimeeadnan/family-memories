@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 
 type Props = { albumId: string };
 
@@ -17,7 +16,6 @@ export default function AdminAlbumUpload({ albumId }: Props) {
   const [progress, setProgress] = useState("");
   const [error, setError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const router = useRouter();
 
   async function load() {
     try {
@@ -80,15 +78,18 @@ export default function AdminAlbumUpload({ albumId }: Props) {
   if (loading) {
     return (
       <div className="flex justify-center py-20">
-        <div className="w-10 h-10 border-2 border-sky-400 border-t-transparent rounded-full animate-spin" />
+        <div className="h-10 w-10 rounded-full border-2 border-champagne-400/30 border-t-regal-400 animate-spin" />
       </div>
     );
   }
   if (error && !album) {
     return (
-      <div className="text-center py-12 text-sky-600">
+      <div className="panel-glass py-10 text-center text-mist-300">
         {error}
-        <Link href="/admin/albums" className="block mt-4 text-sky-600 underline">
+        <Link
+          href="/admin/albums"
+          className="mt-4 block text-regal-300 hover:text-mist-100"
+        >
           Back to albums
         </Link>
       </div>
@@ -96,11 +97,15 @@ export default function AdminAlbumUpload({ albumId }: Props) {
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-semibold text-sky-800">
-        {album?.title ?? "Album"}
-      </h1>
-      <div className="p-6 rounded-2xl bg-white border-2 border-dashed border-sky-300 text-center">
+    <div className="space-y-8">
+      <div>
+        <h1 className="font-display text-2xl font-semibold text-mist-50 sm:text-3xl">
+          {album?.title ?? "Album"}
+        </h1>
+        <div className="rule-gold mt-4 !mx-0 w-16" />
+      </div>
+
+      <div className="panel-glass border-2 border-dashed border-champagne-400/25 p-10 text-center">
         <input
           ref={fileInputRef}
           type="file"
@@ -113,41 +118,48 @@ export default function AdminAlbumUpload({ albumId }: Props) {
         />
         <label
           htmlFor="upload-photos"
-          className="cursor-pointer block text-sky-700 hover:text-sky-800 transition"
+          className="cursor-pointer block text-mist-300 transition hover:text-mist-100"
         >
           {uploading ? (
-            <span className="flex flex-col items-center gap-2">
-              <div className="w-10 h-10 border-2 border-sky-400 border-t-transparent rounded-full animate-spin" />
-              {progress}
+            <span className="flex flex-col items-center gap-3">
+              <div className="h-10 w-10 rounded-full border-2 border-champagne-400/30 border-t-regal-400 animate-spin" />
+              <span className="text-sm text-regal-300">{progress}</span>
             </span>
           ) : (
             <>
-              <span className="text-4xl block mb-2">📷</span>
-              <span className="font-medium">Drop or select photos to upload</span>
+              <span className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full border border-champagne-400/20 bg-midnight-900/60 text-2xl text-regal-300">
+                ✦
+              </span>
+              <span className="font-medium text-mist-100">
+                Tap to select photos
+              </span>
+              <span className="mt-1 block text-sm text-mist-500">
+                Multiple images supported
+              </span>
             </>
           )}
         </label>
       </div>
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-sm text-red-400">{error}</p>}
       {photos.length > 0 && (
         <div>
-          <h2 className="text-lg font-medium text-sky-800 mb-3">
-            Photos in this album ({photos.length})
+          <h2 className="mb-4 font-display text-lg text-mist-200">
+            In this album ({photos.length})
           </h2>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
             {photos.map((p) => (
               <div
                 key={p.id}
-                className="aspect-square rounded-lg overflow-hidden bg-sky-100"
+                className="aspect-square overflow-hidden rounded-lg border border-champagne-400/10 bg-midnight-900"
               >
                 {p.url ? (
                   <img
                     src={p.url}
                     alt=""
-                    className="w-full h-full object-cover"
+                    className="h-full w-full object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-sky-400">
+                  <div className="flex h-full items-center justify-center text-mist-600">
                     —
                   </div>
                 )}

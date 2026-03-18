@@ -8,14 +8,14 @@ export default async function AdminAlbumDetailPage({
 }) {
   const { id } = await params;
   return (
-    <main className="min-h-screen p-6 bg-sky-50">
-      <div className="max-w-2xl mx-auto">
+    <main className="min-h-screen px-4 py-10 sm:px-8">
+      <div className="mx-auto max-w-2xl">
         <header className="mb-8">
           <Link
             href="/admin/albums"
-            className="text-sky-600 hover:text-sky-800 transition"
+            className="text-sm font-medium text-regal-300 transition hover:text-mist-100"
           >
-            ← Back to albums
+            ← All albums
           </Link>
         </header>
         <AdminAlbumUpload albumId={id} />

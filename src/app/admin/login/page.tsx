@@ -8,7 +8,7 @@ export default async function AdminLoginPage() {
     redirect("/admin");
   }
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center p-6 bg-sky-50">
+    <main className="flex min-h-screen flex-col items-center justify-center px-4 py-16">
       <AdminLoginForm />
     </main>
   );

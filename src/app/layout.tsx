@@ -1,5 +1,19 @@
 import type { Metadata } from "next";
+import { Playfair_Display, Source_Sans_3 } from "next/font/google";
+import AppBackground from "@/components/AppBackground";
 import "./globals.css";
+
+const display = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-display",
+  weight: ["400", "600", "700"],
+});
+
+const bodyFont = Source_Sans_3({
+  subsets: ["latin"],
+  variable: "--font-body",
+  weight: ["400", "500", "600"],
+});
 
 export const metadata: Metadata = {
   title: "Family Memories",
@@ -12,9 +26,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className="min-h-screen bg-sky-50 text-sky-900 antialiased">
-        {children}
+    <html lang="en" className={`${display.variable} ${bodyFont.variable}`}>
+      <body className="relative min-h-screen">
+        <AppBackground />
+        <div className="relative z-0">{children}</div>
       </body>
     </html>
   );

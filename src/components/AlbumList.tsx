@@ -18,10 +18,10 @@ export default function AlbumList() {
         const body = await res.json().catch(() => ({}));
         if (!res.ok) {
           if (res.status === 401) {
-            setError("Session missing — try logging in again (use Production URL).");
+            setError("Session missing — try logging in again.");
           } else if (body.code === "CONFIG") {
             setError(
-              "Database not configured: add NEXT_PUBLIC_SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY in Vercel (Production), then Redeploy."
+              "Database not configured. Check Supabase env in Vercel and redeploy."
             );
           } else {
             setError(body.error || "Could not load albums");
@@ -32,7 +32,7 @@ export default function AlbumList() {
         if (!cancelled) setAlbums(Array.isArray(data) ? data : []);
         (Array.isArray(data) ? data : []).forEach((a: Album) => {
           fetch(`/api/albums/${a.id}/photos`, { credentials: "include" })
-            .then((r) => r.ok ? r.json() : [])
+            .then((r) => (r.ok ? r.json() : []))
             .then((photos: PhotoItem[]) => {
               if (cancelled) return;
               const first = photos.find((p) => p.url);
@@ -50,33 +50,42 @@ export default function AlbumList() {
       }
     }
     load();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   if (loading) {
     return (
-      <div className="max-w-4xl mx-auto flex justify-center py-20">
-        <div className="w-10 h-10 border-2 border-sky-400 border-t-transparent rounded-full animate-spin" />
+      <div className="mx-auto flex max-w-4xl justify-center py-24">
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-12 w-12 rounded-full border-2 border-champagne-400/30 border-t-regal-400 animate-spin" />
+          <p className="text-sm text-mist-400">Opening albums…</p>
+        </div>
       </div>
     );
   }
   if (error) {
     return (
-      <div className="max-w-4xl mx-auto text-center py-12 text-sky-600">
+      <div className="panel-glass mx-auto max-w-lg py-10 text-center text-mist-300">
         {error}
       </div>
     );
   }
   if (!albums.length) {
     return (
-      <div className="max-w-4xl mx-auto text-center py-12 text-sky-600">
-        No albums yet. Add some from the admin.
+      <div className="panel-glass mx-auto max-w-lg py-14 text-center">
+        <div className="rule-gold mb-4" />
+        <p className="font-display text-lg text-mist-200">No albums yet</p>
+        <p className="mt-2 text-sm text-mist-400">
+          Ask your curator to add memories from the admin area.
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-6">
+    <div className="mx-auto grid max-w-4xl grid-cols-1 gap-8 sm:grid-cols-2">
       {albums.map((album, i) => (
         <AlbumCard
           key={album.id}

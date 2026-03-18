@@ -18,20 +18,23 @@ export default function AlbumCard({ album, index, coverUrl }: Props) {
   return (
     <Link
       href={`/gallery/${album.id}`}
-      className="block group rounded-2xl overflow-hidden border border-sky-200 bg-white shadow-sm hover:shadow-md hover:border-sky-300 hover:scale-[1.02] active:scale-[0.99] transition-all duration-200 animate-slide-up"
-      style={{ animationDelay: `${index * 60}ms`, animationFillMode: "backwards" }}
+      className="group animate-slide-up block overflow-hidden rounded-2xl border border-champagne-400/15 bg-midnight-850/40 shadow-card backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-champagne-400/30 hover:shadow-[0_12px_40px_rgba(0,0,0,0.35)]"
+      style={{
+        animationDelay: `${index * 70}ms`,
+        animationFillMode: "backwards",
+      }}
     >
-      <div className="aspect-[4/3] bg-sky-100 relative overflow-hidden">
+      <div className="relative aspect-[4/3] overflow-hidden bg-midnight-900">
         {coverUrl ? (
           <img
             src={coverUrl}
             alt=""
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-sky-400">
+          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-midnight-800 to-midnight-900 text-regal-500/40">
             <svg
-              className="w-16 h-16"
+              className="h-16 w-16"
               fill="currentColor"
               viewBox="0 0 24 24"
               aria-hidden
@@ -40,11 +43,13 @@ export default function AlbumCard({ album, index, coverUrl }: Props) {
             </svg>
           </div>
         )}
-      </div>
-      <div className="p-4">
-        <h2 className="font-semibold text-sky-800 group-hover:text-sky-700 truncate">
-          {album.title}
-        </h2>
+        <div className="absolute inset-0 bg-gradient-to-t from-midnight-950/80 via-transparent to-transparent opacity-80" />
+        <div className="absolute bottom-0 left-0 right-0 p-4">
+          <h2 className="font-display text-lg font-semibold text-mist-50 drop-shadow-sm sm:text-xl">
+            {album.title}
+          </h2>
+          <p className="mt-0.5 text-xs text-mist-300/80">Open album →</p>
+        </div>
       </div>
     </Link>
   );

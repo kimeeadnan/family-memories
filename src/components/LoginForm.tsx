@@ -23,7 +23,6 @@ export default function LoginForm() {
         setError(data.error || "Invalid password");
         return;
       }
-      // Full navigation so the session cookie is always sent on the next page
       window.location.href = "/gallery";
     } catch {
       setError("Something went wrong");
@@ -33,35 +32,78 @@ export default function LoginForm() {
   }
 
   return (
-    <div className="w-full max-w-sm animate-fade-in">
-      <div className="rounded-2xl bg-white/80 shadow-lg border border-sky-200/60 p-8 animate-slide-up">
-        <h1 className="text-2xl font-semibold text-sky-800 mb-2 text-center">
+    <div className="w-full max-w-md px-4 animate-fade-in">
+      {/* Ornament widget */}
+      <div className="mb-8 flex flex-col items-center text-champagne-300/80">
+        <div className="mb-3 flex items-center gap-3 text-xs tracking-[0.35em] uppercase">
+          <span className="h-px w-8 bg-gradient-to-r from-transparent to-champagne-400/40" />
+          <span>Est.</span>
+          <span className="h-px w-8 bg-gradient-to-l from-transparent to-champagne-400/40" />
+        </div>
+        <div
+          className="flex h-14 w-14 items-center justify-center rounded-full border border-champagne-400/25 bg-midnight-850/60 shadow-card backdrop-blur-sm"
+          aria-hidden
+        >
+          <svg
+            className="h-7 w-7 text-regal-300"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.2"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              d="M12 21a9 9 0 100-18 9 9 0 000 18z"
+            />
+            <path
+              strokeLinecap="round"
+              d="M12 11v4M12 8h.01"
+            />
+          </svg>
+        </div>
+      </div>
+
+      <div className="panel-glass animate-slide-up overflow-hidden p-8 sm:p-10">
+        <div className="rule-gold mb-6" />
+        <h1 className="font-display text-center text-3xl font-semibold tracking-tight text-mist-50 sm:text-4xl">
           Family Memories
         </h1>
-        <p className="text-sky-600 text-sm text-center mb-6">
-          Enter the family password to view
+        <p className="mt-2 text-center text-sm text-mist-300">
+          A private collection — enter the family key
         </p>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Password"
-            className="w-full px-4 py-3 rounded-xl border border-sky-200 bg-sky-50/50 text-sky-900 placeholder-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent transition"
-            required
-            autoFocus
-          />
+        <form onSubmit={handleSubmit} className="mt-8 space-y-5">
+          <div>
+            <label
+              htmlFor="family-pw"
+              className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-mist-400"
+            >
+              Password
+            </label>
+            <input
+              id="family-pw"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              className="focus-regal w-full rounded-xl border border-champagne-400/15 bg-midnight-950/50 px-4 py-3.5 text-mist-100 placeholder-mist-500 transition hover:border-champagne-400/25"
+              required
+              autoFocus
+            />
+          </div>
           {error && (
-            <p className="text-sm text-red-600 text-center">{error}</p>
+            <p className="text-center text-sm text-red-400/90">{error}</p>
           )}
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 rounded-xl bg-sky-600 text-white font-medium hover:bg-sky-700 active:scale-[0.98] transition disabled:opacity-50"
+            className="w-full rounded-xl border border-champagne-400/20 bg-gradient-to-b from-regal-500/90 to-regal-600 py-3.5 font-semibold text-midnight-950 shadow-lg transition hover:from-regal-400 hover:to-regal-500 disabled:opacity-50"
           >
-            {loading ? "Checking…" : "View memories"}
+            {loading ? "Entering…" : "Enter the gallery"}
           </button>
         </form>
+        <p className="mt-6 text-center text-xs text-mist-500">
+          With love, for family eyes only
+        </p>
       </div>
     </div>
   );

@@ -53,21 +53,24 @@ export default function AdminAlbumsList() {
 
   if (loading) {
     return (
-      <div className="flex justify-center py-12">
-        <div className="w-10 h-10 border-2 border-sky-400 border-t-transparent rounded-full animate-spin" />
+      <div className="flex justify-center py-16">
+        <div className="h-10 w-10 rounded-full border-2 border-champagne-400/30 border-t-regal-400 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <form
         onSubmit={handleCreate}
-        className="p-4 rounded-xl bg-white border border-sky-200 flex flex-wrap gap-3 items-end"
+        className="panel-glass flex flex-wrap items-end gap-4 p-6"
       >
-        <div className="flex-1 min-w-[200px]">
-          <label htmlFor="new-album" className="block text-sm font-medium text-sky-700 mb-1">
-            New album title
+        <div className="min-w-[200px] flex-1">
+          <label
+            htmlFor="new-album"
+            className="mb-2 block text-xs font-medium uppercase tracking-wider text-mist-400"
+          >
+            New album
           </label>
           <input
             id="new-album"
@@ -75,32 +78,37 @@ export default function AdminAlbumsList() {
             value={newTitle}
             onChange={(e) => setNewTitle(e.target.value)}
             placeholder="e.g. Raya 2025"
-            className="w-full px-4 py-2 rounded-lg border border-sky-200 text-sky-900 placeholder-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-400"
+            className="focus-regal w-full rounded-xl border border-champagne-400/15 bg-midnight-950/50 px-4 py-3 text-mist-100 placeholder-mist-500"
           />
         </div>
         <button
           type="submit"
           disabled={creating || !newTitle.trim()}
-          className="px-4 py-2 rounded-lg bg-sky-600 text-white font-medium hover:bg-sky-700 disabled:opacity-50 transition"
+          className="rounded-xl border border-champagne-400/25 bg-gradient-to-b from-regal-500 to-regal-600 px-6 py-3 font-semibold text-midnight-950 transition hover:from-regal-400 hover:to-regal-500 disabled:opacity-40"
         >
-          {creating ? "Creating…" : "Create album"}
+          {creating ? "Creating…" : "Create"}
         </button>
       </form>
-      {error && <p className="text-sm text-red-600">{error}</p>}
-      <ul className="space-y-2">
+      {error && <p className="text-sm text-red-400">{error}</p>}
+      <ul className="space-y-3">
         {albums.map((album) => (
           <li key={album.id}>
             <Link
               href={`/admin/albums/${album.id}`}
-              className="block p-4 rounded-xl bg-white border border-sky-200 text-sky-800 font-medium hover:bg-sky-50 hover:border-sky-300 transition"
+              className="block rounded-xl border border-champagne-400/15 bg-midnight-850/40 p-5 font-medium text-mist-100 transition hover:border-champagne-400/30 hover:bg-midnight-800/50"
             >
               {album.title}
+              <span className="mt-1 block text-xs font-normal text-mist-500">
+                Upload photos →
+              </span>
             </Link>
           </li>
         ))}
       </ul>
       {!albums.length && (
-        <p className="text-sky-600 text-center py-8">No albums yet. Create one above.</p>
+        <p className="py-10 text-center text-mist-500">
+          No albums yet. Create one above.
+        </p>
       )}
     </div>
   );

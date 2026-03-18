@@ -32,33 +32,39 @@ export default function AdminLoginForm() {
   }
 
   return (
-    <div className="w-full max-w-sm animate-fade-in">
-      <div className="rounded-2xl bg-white/80 shadow-lg border border-sky-200/60 p-8 animate-slide-up">
-        <h1 className="text-2xl font-semibold text-sky-800 mb-2 text-center">
-          Admin
+    <div className="w-full max-w-md px-4 animate-fade-in">
+      <div className="mb-6 text-center">
+        <span className="inline-block rounded-full border border-champagne-400/20 bg-midnight-850/50 px-4 py-1 text-xs font-medium uppercase tracking-widest text-champagne-300/90">
+          Administration
+        </span>
+      </div>
+      <div className="panel-glass p-8 sm:p-10">
+        <div className="rule-gold mb-5" />
+        <h1 className="font-display text-center text-2xl font-semibold text-mist-50 sm:text-3xl">
+          Curator access
         </h1>
-        <p className="text-sky-600 text-sm text-center mb-6">
-          Enter admin password
+        <p className="mt-2 text-center text-sm text-mist-400">
+          Manage albums and uploads
         </p>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="mt-8 space-y-5">
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Admin password"
-            className="w-full px-4 py-3 rounded-xl border border-sky-200 bg-sky-50/50 text-sky-900 placeholder-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent transition"
+            className="focus-regal w-full rounded-xl border border-champagne-400/15 bg-midnight-950/50 px-4 py-3.5 text-mist-100 placeholder-mist-500"
             required
             autoFocus
           />
           {error && (
-            <p className="text-sm text-red-600 text-center">{error}</p>
+            <p className="text-center text-sm text-red-400/90">{error}</p>
           )}
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 rounded-xl bg-sky-600 text-white font-medium hover:bg-sky-700 active:scale-[0.98] transition disabled:opacity-50"
+            className="w-full rounded-xl border border-champagne-400/25 bg-midnight-800 py-3.5 font-semibold text-mist-100 transition hover:bg-midnight-750 hover:border-champagne-400/40 disabled:opacity-50"
           >
-            {loading ? "Checking…" : "Sign in"}
+            {loading ? "Signing in…" : "Sign in"}
           </button>
         </form>
       </div>

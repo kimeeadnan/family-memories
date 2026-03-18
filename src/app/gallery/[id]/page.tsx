@@ -1,4 +1,4 @@
-import { redirect, notFound } from "next/navigation";
+import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getFamilySession } from "@/lib/auth";
 import AlbumPhotos from "@/components/AlbumPhotos";
@@ -14,13 +14,19 @@ export default async function AlbumPage({
   }
   const { id } = await params;
   return (
-    <main className="min-h-screen p-6 pb-20 bg-sky-50">
-      <header className="max-w-4xl mx-auto mb-6 flex items-center gap-4">
+    <main className="min-h-screen px-4 pb-24 pt-8 sm:px-6 sm:pt-10">
+      <header className="mx-auto mb-10 max-w-4xl">
         <Link
           href="/gallery"
-          className="text-sky-600 hover:text-sky-800 transition flex items-center gap-1"
+          className="group inline-flex items-center gap-2 text-sm font-medium text-regal-300 transition hover:text-mist-100"
         >
-          <span aria-hidden>←</span> Back
+          <span
+            className="inline-block transition group-hover:-translate-x-0.5"
+            aria-hidden
+          >
+            ←
+          </span>
+          Back to albums
         </Link>
       </header>
       <AlbumPhotos albumId={id} />

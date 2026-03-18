@@ -26,21 +26,23 @@ export default function PhotoGrid({ photos }: Props) {
     .map((p) => ({ src: p.url!, alt: p.caption ?? undefined }));
 
   const getSlideIndex = (photoIndex: number) => {
-    return photos
-      .slice(0, photoIndex + 1)
-      .filter((p) => p.url).length - 1;
+    return (
+      photos.slice(0, photoIndex + 1).filter((p) => p.url).length - 1
+    );
   };
 
   if (!photos.length) {
     return (
-      <p className="text-sky-600 text-center py-12">No photos in this album yet.</p>
+      <p className="py-16 text-center text-mist-400">
+        No photos in this album yet.
+      </p>
     );
   }
 
   return (
     <>
       <div
-        className="columns-2 sm:columns-3 gap-3 space-y-3"
+        className="columns-2 gap-4 space-y-4 sm:columns-3"
         style={{ columnFill: "balance" }}
       >
         {photos.map((photo, i) => (
@@ -48,14 +50,17 @@ export default function PhotoGrid({ photos }: Props) {
             key={photo.id}
             type="button"
             onClick={() => photo.url && open(getSlideIndex(i))}
-            className="break-inside-avoid block w-full rounded-xl overflow-hidden border border-sky-200 bg-white shadow-sm hover:shadow-md hover:border-sky-300 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-sky-400 focus:ring-offset-2 transition-all duration-200 animate-fade-in"
-            style={{ animationDelay: `${i * 30}ms`, animationFillMode: "backwards" }}
+            className="focus-regal animate-fade-in break-inside-avoid block w-full overflow-hidden rounded-xl border border-champagne-400/15 bg-midnight-900/50 shadow-card transition-all duration-300 hover:border-champagne-400/30 hover:shadow-lg focus:ring-offset-midnight-900"
+            style={{
+              animationDelay: `${i * 40}ms`,
+              animationFillMode: "backwards",
+            }}
           >
             {photo.url ? (
               <img
                 src={photo.url}
                 alt={photo.caption ?? ""}
-                className="w-full h-auto object-cover hover:brightness-110 transition"
+                className="w-full object-cover transition duration-300 hover:brightness-110"
               />
             ) : null}
           </button>
