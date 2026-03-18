@@ -35,31 +35,18 @@ export default function LoginForm() {
     <div className="w-full max-w-md px-4 animate-fade-in">
       {/* Ornament widget */}
       <div className="mb-8 flex flex-col items-center text-champagne-300/80">
-        <div className="mb-3 flex items-center gap-3 text-xs tracking-[0.35em] uppercase">
-          <span className="h-px w-8 bg-gradient-to-r from-transparent to-champagne-400/40" />
-          <span>Est.</span>
-          <span className="h-px w-8 bg-gradient-to-l from-transparent to-champagne-400/40" />
+        <div className="mb-3 flex items-center gap-3 text-center text-xs tracking-wide text-champagne-300/90">
+          <span className="h-px w-6 shrink-0 bg-gradient-to-r from-transparent to-champagne-400/40" />
+          <span className="max-w-[14rem] leading-snug sm:max-w-none">
+            By Hakimi Adnan
+          </span>
+          <span className="h-px w-6 shrink-0 bg-gradient-to-l from-transparent to-champagne-400/40" />
         </div>
         <div
-          className="flex h-14 w-14 items-center justify-center rounded-full border border-champagne-400/25 bg-midnight-850/60 shadow-card backdrop-blur-sm"
+          className="flex h-14 w-14 items-center justify-center rounded-full border border-champagne-400/25 bg-midnight-850/60 font-display text-2xl font-semibold text-regal-300 shadow-card backdrop-blur-sm"
           aria-hidden
         >
-          <svg
-            className="h-7 w-7 text-regal-300"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.2"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              d="M12 21a9 9 0 100-18 9 9 0 000 18z"
-            />
-            <path
-              strokeLinecap="round"
-              d="M12 11v4M12 8h.01"
-            />
-          </svg>
+          H
         </div>
       </div>
 
@@ -69,7 +56,8 @@ export default function LoginForm() {
           Family Memories
         </h1>
         <p className="mt-2 text-center text-sm text-mist-300">
-          A private collection — enter the family key
+          A private collection —{" "}
+          <span className="font-bold text-mist-50">Adnan&apos;s family</span>
         </p>
         <form onSubmit={handleSubmit} className="mt-8 space-y-5">
           <div>

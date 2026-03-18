@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import AlbumSlideshow from "./AlbumSlideshow";
+import FamilyTreeModal from "./FamilyTreeModal";
 import PhotoGrid, { type PhotoItem } from "./PhotoGrid";
 
 type Props = { albumId: string };
@@ -66,9 +67,12 @@ export default function AlbumPhotos({ albumId }: Props) {
   return (
     <div className="mx-auto max-w-4xl">
       <div className="mb-10 border-b border-champagne-400/15 pb-8">
-        <p className="mb-2 text-xs font-medium uppercase tracking-widest text-champagne-400/60">
-          Album
-        </p>
+        <div className="mb-2 flex items-center justify-between gap-3">
+          <p className="text-xs font-medium uppercase tracking-widest text-champagne-400/60">
+            Album
+          </p>
+          <FamilyTreeModal />
+        </div>
         <h1 className="font-display text-3xl font-semibold text-mist-50 sm:text-4xl">
           {album.title}
         </h1>
