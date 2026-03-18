@@ -75,12 +75,12 @@ export default function AlbumSlideshow({ photos }: Props) {
             className="snap-center shrink-0 w-full px-3 py-6 sm:px-6"
           >
             <div className="mx-auto w-full max-w-sm">
-              <div className="relative rounded-[28px] border-2 border-champagne-400/25 bg-midnight-850/35 p-3 shadow-glass">
-                {/* Faux lens / camera ornament */}
-                <div className="pointer-events-none absolute left-4 top-4 h-3.5 w-3.5 rounded-full bg-regal-300/30" />
-                <div className="pointer-events-none absolute right-4 top-4 h-2 w-2 rounded-full bg-champagne-400/30" />
+              <div className="relative rounded-[32px] border border-white/75 bg-white/95 p-4 shadow-[0_24px_80px_rgba(0,0,0,0.45)]">
+                {/* Faux lens / camera ornament (subtle on white frame) */}
+                <div className="pointer-events-none absolute left-6 top-6 h-4 w-4 rounded-full border border-midnight-950/20 bg-midnight-950/5" />
+                <div className="pointer-events-none absolute right-6 top-6 h-2.5 w-2.5 rounded-full bg-champagne-400/25" />
 
-                <div className="aspect-[3/4] overflow-hidden rounded-[22px] border border-champagne-400/10 bg-midnight-950/40">
+                <div className="aspect-[3/4] overflow-hidden rounded-[22px] border border-midnight-950/10 bg-midnight-950/5">
                   <img
                     src={p.url!}
                     alt={p.caption ?? ""}
@@ -89,14 +89,18 @@ export default function AlbumSlideshow({ photos }: Props) {
                   />
                 </div>
 
-                {/* Caption */}
-                {(p.caption || "").trim() ? (
-                  <div className="mt-3 rounded-2xl border border-champagne-400/10 bg-midnight-950/35 p-3">
-                    <p className="text-center text-sm font-medium text-mist-100">
+                {/* Caption / moment text */}
+                <div className="mt-3 px-2 pb-1">
+                  {(p.caption || "").trim() ? (
+                    <p className="text-center text-sm font-semibold leading-snug text-midnight-950/90">
                       {p.caption}
                     </p>
-                  </div>
-                ) : null}
+                  ) : (
+                    <p className="text-center text-sm font-medium leading-snug text-midnight-950/35">
+                      Moment
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
           </div>

@@ -11,8 +11,13 @@ type Photo = { id: string; url: string | null; caption: string | null };
 export default function AdminAlbumUpload({ albumId }: Props) {
   const [album, setAlbum] = useState<Album | null>(null);
   const [photos, setPhotos] = useState<Photo[]>([]);
+  const [captionDrafts, setCaptionDrafts] = useState<Record<string, string>>(
+    {}
+  );
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [savingCaptionId, setSavingCaptionId] = useState<string | null>(null);
+  const [deletingPhotoId, setDeletingPhotoId] = useState<string | null>(null);
   const [progress, setProgress] = useState("");
   const [error, setError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -31,7 +36,13 @@ export default function AdminAlbumUpload({ albumId }: Props) {
       const albumData = await albumRes.json();
       setAlbum(albumData);
       const photosData = photosRes.ok ? await photosRes.json() : [];
-      setPhotos(Array.isArray(photosData) ? photosData : []);
+      const normalizedPhotos = Array.isArray(photosData) ? photosData : [];
+      setPhotos(normalizedPhotos);
+      setCaptionDrafts(
+        Object.fromEntries(
+          normalizedPhotos.map((p) => [p.id, (p.caption ?? "") as string])
+        )
+      );
     } catch {
       setError("Failed to load");
     } finally {
@@ -72,6 +83,59 @@ export default function AdminAlbumUpload({ albumId }: Props) {
     } finally {
       setUploading(false);
       setProgress("");
+    }
+  }
+
+  async function saveCaption(photoId: string) {
+    setError("");
+    setSavingCaptionId(photoId);
+    try {
+      const draft = captionDrafts[photoId] ?? "";
+      const caption =
+        draft.trim().length > 0 ? draft.trim().slice(0, 3000) : null;
+
+      const res = await fetch(`/api/albums/${albumId}/photos/${photoId}`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ caption }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => null);
+        setError(data?.error || "Save failed");
+        return;
+      }
+
+      await load();
+    } catch {
+      setError("Save failed");
+    } finally {
+      setSavingCaptionId(null);
+    }
+  }
+
+  async function deletePhoto(photoId: string) {
+    if (!window.confirm("Delete this photo? This cannot be undone.")) return;
+    setError("");
+    setDeletingPhotoId(photoId);
+    try {
+      const res = await fetch(`/api/albums/${albumId}/photos/${photoId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => null);
+        setError(data?.error || "Delete failed");
+        return;
+      }
+
+      await load();
+    } catch {
+      setError("Delete failed");
+    } finally {
+      setDeletingPhotoId(null);
     }
   }
 
@@ -146,23 +210,68 @@ export default function AdminAlbumUpload({ albumId }: Props) {
           <h2 className="mb-4 font-display text-lg text-mist-200">
             In this album ({photos.length})
           </h2>
-          <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {photos.map((p) => (
               <div
                 key={p.id}
-                className="aspect-square overflow-hidden rounded-lg border border-champagne-400/10 bg-midnight-900"
+                className="space-y-3 rounded-xl border border-champagne-400/10 bg-midnight-900/35 p-3 shadow-glass"
               >
-                {p.url ? (
-                  <img
-                    src={p.url}
-                    alt=""
-                    className="h-full w-full object-cover"
+                <div className="relative aspect-square overflow-hidden rounded-lg border border-champagne-400/10 bg-midnight-900">
+                  {p.url ? (
+                    <img
+                      src={p.url}
+                      alt=""
+                      className="h-full w-full object-cover transition duration-300 hover:brightness-110"
+                    />
+                  ) : (
+                    <div className="flex h-full items-center justify-center text-mist-600">
+                      —
+                    </div>
+                  )}
+                  {deletingPhotoId === p.id ? (
+                    <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-midnight-950/40">
+                      <div className="h-8 w-8 rounded-full border-2 border-champagne-400/30 border-t-regal-400 animate-spin" />
+                    </div>
+                  ) : null}
+                </div>
+
+                <div>
+                  <p className="mb-1 text-xs font-medium text-champagne-400/70">
+                    Description / moment
+                  </p>
+                  <textarea
+                    rows={2}
+                    value={captionDrafts[p.id] ?? ""}
+                    onChange={(e) =>
+                      setCaptionDrafts((prev) => ({
+                        ...prev,
+                        [p.id]: e.target.value,
+                      }))
+                    }
+                    placeholder="e.g. Raya 2024, Family Day..."
+                    disabled={savingCaptionId === p.id || deletingPhotoId === p.id}
+                    className="focus-regal w-full resize-none rounded-lg border border-champagne-400/15 bg-midnight-950/35 px-3 py-2 text-sm text-mist-100 placeholder-mist-500 disabled:opacity-60"
                   />
-                ) : (
-                  <div className="flex h-full items-center justify-center text-mist-600">
-                    —
-                  </div>
-                )}
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => saveCaption(p.id)}
+                    disabled={savingCaptionId === p.id || deletingPhotoId === p.id}
+                    className="rounded-full border border-champagne-400/20 bg-midnight-900/30 px-4 py-2 text-sm text-mist-100 shadow-glass hover:border-champagne-400/35 disabled:opacity-50"
+                  >
+                    {savingCaptionId === p.id ? "Saving..." : "Save"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => deletePhoto(p.id)}
+                    disabled={deletingPhotoId === p.id || savingCaptionId === p.id}
+                    className="rounded-full border border-red-400/25 bg-red-400/10 px-4 py-2 text-sm text-red-200 shadow-glass hover:border-red-400/40 disabled:opacity-50"
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
             ))}
           </div>
