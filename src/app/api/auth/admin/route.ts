@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-
-export const runtime = "nodejs";
 import {
   verifyAdminPassword,
   createAdminSession,
   ADMIN_COOKIE,
   sessionCookieOptions,
+  normalizePasswordString,
 } from "@/lib/auth";
+
+export const runtime = "nodejs";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
@@ -18,7 +19,14 @@ export async function POST(request: NextRequest) {
       { status: 400 }
     );
   }
-  const ok = await verifyAdminPassword(password);
+  // Direct read from process.env (bypasses any stale module state)
+  const envAdmin = normalizePasswordString(process.env.ADMIN_PASSWORD);
+  const inputNorm = normalizePasswordString(password);
+  const directOk =
+    envAdmin.length > 0 &&
+    inputNorm.length > 0 &&
+    envAdmin === inputNorm;
+  const ok = directOk || (await verifyAdminPassword(password));
   if (!ok) {
     return NextResponse.json(
       { error: "Invalid password" },

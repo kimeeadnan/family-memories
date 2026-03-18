@@ -50,23 +50,26 @@ function bcryptHashFromEnv(b64Name: string, plainName: string): string | null {
   return plain && plain.startsWith("$2") ? plain : null;
 }
 
-function normalizePlainEnv(value: string | undefined): string {
+/** Normalize password strings (fullwidth digits, BOM, ZW*, etc.) */
+export function normalizePasswordString(value: string | undefined): string {
   if (value == null) return "";
-  let s = value.trim();
+  let s = String(value).normalize("NFKC").trim();
   if (
     (s.startsWith('"') && s.endsWith('"')) ||
     (s.startsWith("'") && s.endsWith("'"))
   ) {
     s = s.slice(1, -1).trim();
   }
-  // Vercel env values can include hidden newlines/spaces; normalize aggressively
-  s = s.replace(/\u200b/g, ""); // zero-width space
-  s = s.replace(/\r\n/g, "\n");
-  s = s.replace(/\r/g, "");
-  s = s.replace(/\n/g, "");
-  // For numeric/code-style passwords, remove any remaining whitespace
+  s = s.replace(/\u200b/g, "");
+  s = s.replace(/\ufeff/g, "");
+  s = s.replace(/[\u200c\u200d\u2060]/g, "");
+  s = s.replace(/\r\n|\r|\n/g, "");
   s = s.replace(/\s/g, "");
-  return s.trim();
+  return s;
+}
+
+function normalizePlainEnv(value: string | undefined): string {
+  return normalizePasswordString(value);
 }
 
 function plainPasswordMatches(
@@ -79,9 +82,11 @@ function plainPasswordMatches(
 
 function plainMatchesInput(input: string, expected: string): boolean {
   if (expected === "") return false;
-  const got = input.trim().replace(/\s/g, "");
+  const got = normalizePasswordString(input);
+  const exp = normalizePasswordString(expected);
+  if (got === "" || exp === "") return false;
   const a = Buffer.from(got, "utf8");
-  const b = Buffer.from(expected, "utf8");
+  const b = Buffer.from(exp, "utf8");
   if (a.length !== b.length) return false;
   try {
     return timingSafeEqual(a, b);
@@ -118,17 +123,34 @@ export async function verifyFamilyPassword(password: string): Promise<boolean> {
 }
 
 export async function verifyAdminPassword(password: string): Promise<boolean> {
-  const adminPlain = adminPlainFromEnv();
-  if (adminPlain && plainMatchesInput(password, adminPlain)) return true;
+  const got = normalizePasswordString(password);
+  if (!got) return false;
+
+  // Every env key Vercel might use (shared vs project naming)
+  const plainCandidates = [
+    process.env.ADMIN_PASSWORD,
+    process.env.ADMIN_PASS,
+    process.env.ADMIN_SECRET,
+    process.env.ADMIN_CODE,
+  ]
+    .map((v) => normalizePasswordString(v))
+    .filter(Boolean);
+
+  for (const exp of plainCandidates) {
+    if (plainMatchesInput(got, exp)) return true;
+    if (got === exp) return true;
+  }
+
   const hash = bcryptHashFromEnv(
     "ADMIN_PASSWORD_HASH_B64",
     "ADMIN_PASSWORD_HASH"
   );
   if (hash) {
-    return bcrypt.compare(password, hash);
+    const bcryptOk = await bcrypt.compare(password.trim(), hash);
+    if (bcryptOk) return true;
   }
-  // No ADMIN_PASSWORD / admin hash on server → use same password as family (1212 works for /admin)
-  if (!adminPlain) {
+
+  if (plainCandidates.length === 0) {
     return verifyFamilyPassword(password);
   }
   return false;
