@@ -50,13 +50,26 @@ function bcryptHashFromEnv(b64Name: string, plainName: string): string | null {
   return plain && plain.startsWith("$2") ? plain : null;
 }
 
+function normalizePlainEnv(value: string | undefined): string {
+  if (value == null) return "";
+  let s = value.trim();
+  if (
+    (s.startsWith('"') && s.endsWith('"')) ||
+    (s.startsWith("'") && s.endsWith("'"))
+  ) {
+    s = s.slice(1, -1).trim();
+  }
+  return s.replace(/\r\n/g, "\n").trim();
+}
+
 function plainPasswordMatches(
   input: string,
   envName: "FAMILY_PASSWORD" | "ADMIN_PASSWORD"
 ): boolean {
-  const expected = process.env[envName];
-  if (expected == null || expected === "") return false;
-  const a = Buffer.from(input, "utf8");
+  const expected = normalizePlainEnv(process.env[envName]);
+  if (expected === "") return false;
+  const got = input.trim();
+  const a = Buffer.from(got, "utf8");
   const b = Buffer.from(expected, "utf8");
   if (a.length !== b.length) return false;
   try {
@@ -64,6 +77,14 @@ function plainPasswordMatches(
   } catch {
     return false;
   }
+}
+
+/** True if server will accept plain-password login (for diagnostics). */
+export function envHasPlainFamilyPassword(): boolean {
+  return normalizePlainEnv(process.env.FAMILY_PASSWORD) !== "";
+}
+export function envHasPlainAdminPassword(): boolean {
+  return normalizePlainEnv(process.env.ADMIN_PASSWORD) !== "";
 }
 
 export async function verifyFamilyPassword(password: string): Promise<boolean> {
