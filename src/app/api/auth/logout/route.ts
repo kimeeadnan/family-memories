@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
-import { clearFamilyCookie, clearAdminCookie } from "@/lib/auth";
+import { SESSION_COOKIE, ADMIN_COOKIE } from "@/lib/auth";
 
 export async function POST() {
-  await clearFamilyCookie();
-  await clearAdminCookie();
-  return NextResponse.json({ ok: true });
+  const res = NextResponse.json({ ok: true });
+  res.cookies.set(SESSION_COOKIE, "", { path: "/", maxAge: 0 });
+  res.cookies.set(ADMIN_COOKIE, "", { path: "/", maxAge: 0 });
+  return res;
 }

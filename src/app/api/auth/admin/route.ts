@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   verifyAdminPassword,
   createAdminSession,
-  setAdminCookie,
+  ADMIN_COOKIE,
+  sessionCookieOptions,
 } from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
@@ -23,6 +24,7 @@ export async function POST(request: NextRequest) {
     );
   }
   const token = await createAdminSession();
-  await setAdminCookie(token);
-  return NextResponse.json({ ok: true });
+  const res = NextResponse.json({ ok: true });
+  res.cookies.set(ADMIN_COOKIE, token, sessionCookieOptions());
+  return res;
 }

@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   verifyFamilyPassword,
   createFamilySession,
-  setFamilyCookie,
+  SESSION_COOKIE,
+  sessionCookieOptions,
 } from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
@@ -23,6 +24,7 @@ export async function POST(request: NextRequest) {
     );
   }
   const token = await createFamilySession();
-  await setFamilyCookie(token);
-  return NextResponse.json({ ok: true });
+  const res = NextResponse.json({ ok: true });
+  res.cookies.set(SESSION_COOKIE, token, sessionCookieOptions());
+  return res;
 }

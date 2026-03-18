@@ -2,9 +2,20 @@ import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import bcrypt from "bcryptjs";
 
-const SESSION_COOKIE = "family_memories_session";
-const ADMIN_COOKIE = "family_memories_admin";
-const SESSION_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
+export const SESSION_COOKIE = "family_memories_session";
+export const ADMIN_COOKIE = "family_memories_admin";
+export const SESSION_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
+
+/** Use on NextResponse in Route Handlers (Vercel ignores cookies().set() there). */
+export function sessionCookieOptions() {
+  return {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax" as const,
+    maxAge: SESSION_MAX_AGE,
+    path: "/",
+  };
+}
 const SECRET = new TextEncoder().encode(
   process.env.SESSION_SECRET || "change-me-in-production"
 );
