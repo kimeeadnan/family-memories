@@ -111,13 +111,20 @@ export async function verifyFamilyPassword(password: string): Promise<boolean> {
 }
 
 export async function verifyAdminPassword(password: string): Promise<boolean> {
-  if (plainMatchesInput(password, adminPlainFromEnv())) return true;
+  const adminPlain = adminPlainFromEnv();
+  if (adminPlain && plainMatchesInput(password, adminPlain)) return true;
   const hash = bcryptHashFromEnv(
     "ADMIN_PASSWORD_HASH_B64",
     "ADMIN_PASSWORD_HASH"
   );
-  if (!hash) return false;
-  return bcrypt.compare(password, hash);
+  if (hash) {
+    return bcrypt.compare(password, hash);
+  }
+  // No ADMIN_PASSWORD / admin hash on server → use same password as family (1212 works for /admin)
+  if (!adminPlain) {
+    return verifyFamilyPassword(password);
+  }
+  return false;
 }
 
 export async function createFamilySession(): Promise<string> {
