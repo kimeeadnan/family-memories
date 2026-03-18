@@ -1,13 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 
 export default function LoginForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -17,6 +15,7 @@ export default function LoginForm() {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ password }),
       });
       const data = await res.json();
@@ -24,8 +23,8 @@ export default function LoginForm() {
         setError(data.error || "Invalid password");
         return;
       }
-      router.push("/gallery");
-      router.refresh();
+      // Full navigation so the session cookie is always sent on the next page
+      window.location.href = "/gallery";
     } catch {
       setError("Something went wrong");
     } finally {

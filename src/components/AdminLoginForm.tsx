@@ -1,13 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 
 export default function AdminLoginForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -17,6 +15,7 @@ export default function AdminLoginForm() {
       const res = await fetch("/api/auth/admin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ password }),
       });
       const data = await res.json();
@@ -24,8 +23,7 @@ export default function AdminLoginForm() {
         setError(data.error || "Invalid password");
         return;
       }
-      router.push("/admin");
-      router.refresh();
+      window.location.href = "/admin";
     } catch {
       setError("Something went wrong");
     } finally {

@@ -1,3 +1,4 @@
+import { timingSafeEqual } from "crypto";
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import bcrypt from "bcryptjs";
@@ -23,12 +24,24 @@ const SECRET = new TextEncoder().encode(
 export type SessionPayload = { role: "family"; exp: number };
 export type AdminPayload = { role: "admin"; exp: number };
 
+function normalizeB64(raw: string | undefined): string | undefined {
+  if (!raw) return;
+  let s = raw.trim();
+  if (
+    (s.startsWith('"') && s.endsWith('"')) ||
+    (s.startsWith("'") && s.endsWith("'"))
+  ) {
+    s = s.slice(1, -1).trim();
+  }
+  return s.replace(/\s/g, "");
+}
+
 function bcryptHashFromEnv(b64Name: string, plainName: string): string | null {
-  const b64 = process.env[b64Name]?.trim();
+  const b64 = normalizeB64(process.env[b64Name]);
   if (b64) {
     try {
       const decoded = Buffer.from(b64, "base64").toString("utf8");
-      if (decoded.startsWith("$2")) return decoded;
+      if (decoded.startsWith("$2") && decoded.length >= 50) return decoded;
     } catch {
       /* ignore */
     }
@@ -37,7 +50,24 @@ function bcryptHashFromEnv(b64Name: string, plainName: string): string | null {
   return plain && plain.startsWith("$2") ? plain : null;
 }
 
+function plainPasswordMatches(
+  input: string,
+  envName: "FAMILY_PASSWORD" | "ADMIN_PASSWORD"
+): boolean {
+  const expected = process.env[envName];
+  if (expected == null || expected === "") return false;
+  const a = Buffer.from(input, "utf8");
+  const b = Buffer.from(expected, "utf8");
+  if (a.length !== b.length) return false;
+  try {
+    return timingSafeEqual(a, b);
+  } catch {
+    return false;
+  }
+}
+
 export async function verifyFamilyPassword(password: string): Promise<boolean> {
+  if (plainPasswordMatches(password, "FAMILY_PASSWORD")) return true;
   const hash = bcryptHashFromEnv(
     "FAMILY_PASSWORD_HASH_B64",
     "FAMILY_PASSWORD_HASH"
@@ -47,6 +77,7 @@ export async function verifyFamilyPassword(password: string): Promise<boolean> {
 }
 
 export async function verifyAdminPassword(password: string): Promise<boolean> {
+  if (plainPasswordMatches(password, "ADMIN_PASSWORD")) return true;
   const hash = bcryptHashFromEnv(
     "ADMIN_PASSWORD_HASH_B64",
     "ADMIN_PASSWORD_HASH"
