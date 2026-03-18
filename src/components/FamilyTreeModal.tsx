@@ -81,45 +81,45 @@ export default function FamilyTreeModal() {
               </button>
             </div>
 
-            {/* Tree: Humaidi → Hana | Alya | Adnan+Hapizah → Hafiz, Hakimi */}
-            <div className="family-tree mx-auto text-mist-200">
+            {/* Adnan + Hapizah → Humaidi, Hafiz, Hakimi → under Humaidi: Hana, Alya */}
+            <div className="family-tree mx-auto max-w-2xl text-mist-200">
               <div className="flex flex-col items-center">
-                <Node>Humaidi</Node>
-                <div className="tree-vline h-6 w-px bg-champagne-400/35" />
-                <div className="relative flex w-full max-w-xl justify-center">
-                  <div className="absolute left-[12%] right-[12%] top-0 h-px bg-champagne-400/35 sm:left-[10%] sm:right-[10%]" />
-                  <div className="relative z-[1] flex w-full justify-between gap-1 px-0 sm:gap-2 sm:px-2">
-                    <div className="flex flex-1 flex-col items-center">
+                <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+                  <Node subtitle="Dad">Adnan</Node>
+                  <span className="text-champagne-400/45" aria-hidden>
+                    ·
+                  </span>
+                  <Node subtitle="Mom">Hapizah</Node>
+                </div>
+                <div className="h-6 w-px bg-champagne-400/35" />
+                <div className="relative w-full px-2 sm:px-4">
+                  <div className="absolute left-[16%] right-[16%] top-0 h-px bg-champagne-400/35 sm:left-[12%] sm:right-[12%]" />
+                  <div className="relative z-[1] grid grid-cols-3 gap-2 sm:gap-4">
+                    <div className="flex flex-col items-center">
                       <div className="h-6 w-px bg-champagne-400/35" />
-                      <Node>Hana</Node>
-                    </div>
-                    <div className="flex flex-1 flex-col items-center">
-                      <div className="h-6 w-px bg-champagne-400/35" />
-                      <Node>Alya</Node>
-                    </div>
-                    <div className="flex flex-[1.4] flex-col items-center sm:flex-[1.6]">
-                      <div className="h-6 w-px bg-champagne-400/35" />
-                      <div className="flex w-full flex-wrap items-stretch justify-center gap-2">
-                        <Node subtitle="Dad">Adnan</Node>
-                        <div className="hidden self-center text-champagne-400/50 sm:block" aria-hidden>
-                          ·
-                        </div>
-                        <Node subtitle="Mom">Hapizah</Node>
-                      </div>
-                      <div className="mt-3 flex flex-col items-center">
-                        <div className="h-5 w-px bg-champagne-400/35" />
-                        <div className="h-px w-[min(12rem,50vw)] bg-champagne-400/35" />
-                        <div className="flex w-full max-w-xs justify-center gap-4 sm:gap-8">
+                      <Node>Humaidi</Node>
+                      <div className="mt-4 h-5 w-px bg-champagne-400/35" />
+                      <div className="relative w-full">
+                        <div className="absolute left-[15%] right-[15%] top-0 h-px bg-champagne-400/35" />
+                        <div className="relative z-[1] flex justify-center gap-3 pt-0 sm:gap-6">
                           <div className="flex flex-col items-center">
                             <div className="h-5 w-px bg-champagne-400/35" />
-                            <Node subtitle="Son">Hafiz</Node>
+                            <Node>Hana</Node>
                           </div>
                           <div className="flex flex-col items-center">
                             <div className="h-5 w-px bg-champagne-400/35" />
-                            <Node subtitle="Son">Hakimi</Node>
+                            <Node>Alya</Node>
                           </div>
                         </div>
                       </div>
+                    </div>
+                    <div className="flex flex-col items-center">
+                      <div className="h-6 w-px bg-champagne-400/35" />
+                      <Node>Hafiz</Node>
+                    </div>
+                    <div className="flex flex-col items-center">
+                      <div className="h-6 w-px bg-champagne-400/35" />
+                      <Node>Hakimi</Node>
                     </div>
                   </div>
                 </div>
