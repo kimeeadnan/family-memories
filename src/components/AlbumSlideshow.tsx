@@ -89,20 +89,14 @@ export default function AlbumSlideshow({ photos }: Props) {
                   />
                 </div>
 
-                {/* Divider: photo | text — crisp black rule */}
-                <div
-                  className="my-3 h-[2px] w-full rounded-none bg-midnight-950 shadow-[0_1px_0_rgba(255,255,255,0.9),0_2px_4px_rgba(0,0,0,0.08)]"
-                  aria-hidden
-                />
-
                 {/* Caption / moment — marker-style font */}
-                <div className="px-2 pb-2 pt-0">
+                <div className="px-2 pb-2 pt-3">
                   {(p.caption || "").trim() ? (
-                    <p className="font-marker text-center text-base leading-relaxed tracking-wide text-midnight-950 sm:text-lg">
+                    <p className="font-marker text-center text-lg leading-relaxed tracking-wide text-midnight-950 sm:text-xl">
                       {p.caption}
                     </p>
                   ) : (
-                    <p className="font-marker text-center text-base leading-relaxed text-midnight-950/40 sm:text-lg">
+                    <p className="font-marker text-center text-lg leading-relaxed text-midnight-950/40 sm:text-xl">
                       Moment
                     </p>
                   )}
