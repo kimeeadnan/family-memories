@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Source_Sans_3 } from "next/font/google";
+import {
+  Permanent_Marker,
+  Playfair_Display,
+  Source_Sans_3,
+} from "next/font/google";
 import AppBackground from "@/components/AppBackground";
 import "./globals.css";
 
@@ -15,6 +19,12 @@ const bodyFont = Source_Sans_3({
   weight: ["400", "500", "600"],
 });
 
+const markerFont = Permanent_Marker({
+  subsets: ["latin"],
+  variable: "--font-marker",
+  weight: "400",
+});
+
 export const metadata: Metadata = {
   title: "Family Memories",
   description: "Our family photo albums",
@@ -26,7 +36,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${display.variable} ${bodyFont.variable}`}>
+    <html
+      lang="en"
+      className={`${display.variable} ${bodyFont.variable} ${markerFont.variable}`}
+    >
       <body className="relative min-h-screen">
         <AppBackground />
         <div className="relative z-0">{children}</div>

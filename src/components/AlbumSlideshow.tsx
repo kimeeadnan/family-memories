@@ -80,7 +80,7 @@ export default function AlbumSlideshow({ photos }: Props) {
                 <div className="pointer-events-none absolute left-6 top-6 h-4 w-4 rounded-full border border-midnight-950/20 bg-midnight-950/5" />
                 <div className="pointer-events-none absolute right-6 top-6 h-2.5 w-2.5 rounded-full bg-champagne-400/25" />
 
-                <div className="aspect-[3/4] overflow-hidden rounded-[22px] border border-midnight-950/10 bg-midnight-950/5">
+                <div className="aspect-square overflow-hidden rounded-[20px] border border-midnight-950/10 bg-midnight-950/5">
                   <img
                     src={p.url!}
                     alt={p.caption ?? ""}
@@ -89,14 +89,20 @@ export default function AlbumSlideshow({ photos }: Props) {
                   />
                 </div>
 
-                {/* Caption / moment text */}
-                <div className="mt-3 px-2 pb-1">
+                {/* Divider: photo | text — crisp black rule */}
+                <div
+                  className="mx-2 my-3 h-[2px] rounded-full bg-midnight-950 shadow-[0_1px_0_rgba(255,255,255,0.9),0_2px_4px_rgba(0,0,0,0.08)]"
+                  aria-hidden
+                />
+
+                {/* Caption / moment — marker-style font */}
+                <div className="px-2 pb-2 pt-0">
                   {(p.caption || "").trim() ? (
-                    <p className="text-center text-sm font-semibold leading-snug text-midnight-950/90">
+                    <p className="font-marker text-center text-base leading-relaxed tracking-wide text-midnight-950 sm:text-lg">
                       {p.caption}
                     </p>
                   ) : (
-                    <p className="text-center text-sm font-medium leading-snug text-midnight-950/35">
+                    <p className="font-marker text-center text-base leading-relaxed text-midnight-950/40 sm:text-lg">
                       Moment
                     </p>
                   )}

@@ -11,6 +11,7 @@ const config: Config = {
       fontFamily: {
         display: ["var(--font-display)", "Georgia", "serif"],
         sans: ["var(--font-body)", "system-ui", "sans-serif"],
+        marker: ["var(--font-marker)", "cursive", "sans-serif"],
       },
       colors: {
         midnight: {
