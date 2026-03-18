@@ -22,8 +22,8 @@ export default function AdminAlbumUpload({ albumId }: Props) {
   async function load() {
     try {
       const [albumRes, photosRes] = await Promise.all([
-        fetch(`/api/albums/${albumId}`),
-        fetch(`/api/albums/${albumId}/photos`),
+        fetch(`/api/albums/${albumId}`, { credentials: "include" }),
+        fetch(`/api/albums/${albumId}/photos`, { credentials: "include" }),
       ]);
       if (!albumRes.ok) {
         setError("Album not found");
@@ -57,6 +57,7 @@ export default function AdminAlbumUpload({ albumId }: Props) {
     }
     try {
       const res = await fetch(`/api/albums/${albumId}/photos`, {
+        credentials: "include",
         method: "POST",
         body: formData,
       });

@@ -2,19 +2,32 @@ import { NextRequest, NextResponse } from "next/server";
 import { getFamilySession, getAdminSession } from "@/lib/auth";
 import { supabase } from "@/lib/supabase-server";
 
+export const runtime = "nodejs";
+
 export async function GET() {
   const session = await getFamilySession();
   if (!session) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json(
+      { error: "Unauthorized", code: "NO_SESSION" },
+      { status: 401 }
+    );
   }
-  const { data, error } = await supabase
-    .from("albums")
-    .select("id, title, created_at")
-    .order("created_at", { ascending: false });
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  try {
+    const { data, error } = await supabase
+      .from("albums")
+      .select("id, title, created_at")
+      .order("created_at", { ascending: false });
+    if (error) {
+      return NextResponse.json(
+        { error: error.message, code: "SUPABASE" },
+        { status: 500 }
+      );
+    }
+    return NextResponse.json(data ?? []);
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "Supabase error";
+    return NextResponse.json({ error: msg, code: "CONFIG" }, { status: 503 });
   }
-  return NextResponse.json(data);
 }
 
 export async function POST(request: NextRequest) {
@@ -30,13 +43,18 @@ export async function POST(request: NextRequest) {
       { status: 400 }
     );
   }
-  const { data, error } = await supabase
-    .from("albums")
-    .insert({ title })
-    .select("id, title, created_at")
-    .single();
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  try {
+    const { data, error } = await supabase
+      .from("albums")
+      .insert({ title })
+      .select("id, title, created_at")
+      .single();
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+    return NextResponse.json(data);
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "Supabase error";
+    return NextResponse.json({ error: msg }, { status: 503 });
   }
-  return NextResponse.json(data);
 }

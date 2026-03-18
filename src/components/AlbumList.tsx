@@ -14,15 +14,24 @@ export default function AlbumList() {
     let cancelled = false;
     async function load() {
       try {
-        const res = await fetch("/api/albums");
+        const res = await fetch("/api/albums", { credentials: "include" });
+        const body = await res.json().catch(() => ({}));
         if (!res.ok) {
-          setError("Could not load albums");
+          if (res.status === 401) {
+            setError("Session missing — try logging in again (use Production URL).");
+          } else if (body.code === "CONFIG") {
+            setError(
+              "Database not configured: add NEXT_PUBLIC_SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY in Vercel (Production), then Redeploy."
+            );
+          } else {
+            setError(body.error || "Could not load albums");
+          }
           return;
         }
-        const data = await res.json();
-        if (!cancelled) setAlbums(data);
-        data.forEach((a: Album) => {
-          fetch(`/api/albums/${a.id}/photos`)
+        const data = body;
+        if (!cancelled) setAlbums(Array.isArray(data) ? data : []);
+        (Array.isArray(data) ? data : []).forEach((a: Album) => {
+          fetch(`/api/albums/${a.id}/photos`, { credentials: "include" })
             .then((r) => r.ok ? r.json() : [])
             .then((photos: PhotoItem[]) => {
               if (cancelled) return;

@@ -3,6 +3,7 @@ import {
   envHasPlainFamilyPassword,
   envHasPlainAdminPassword,
 } from "@/lib/auth";
+import { supabaseConfigured } from "@/lib/supabase-server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -19,7 +20,8 @@ export async function GET() {
     vercelEnv: process.env.VERCEL_ENV ?? null,
     familyPlainPasswordSet: envHasPlainFamilyPassword(),
     adminPlainPasswordSet: envHasPlainAdminPassword(),
+    supabaseUrlAndKeySet: supabaseConfigured(),
     hint:
-      "If familyPlainPasswordSet is false: either vars are missing, or this deploy is Preview — enable variables for Preview too, or use your production .vercel.app URL. Then Redeploy.",
+      "Albums need supabaseUrlAndKeySet=true. Admin needs adminPlainPasswordSet=true (ADMIN_PASSWORD=2212529). Redeploy after any env change.",
   });
 }

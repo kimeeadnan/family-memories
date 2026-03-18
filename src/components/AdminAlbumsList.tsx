@@ -13,7 +13,7 @@ export default function AdminAlbumsList() {
   const [error, setError] = useState("");
 
   async function loadAlbums() {
-    const res = await fetch("/api/albums");
+    const res = await fetch("/api/albums", { credentials: "include" });
     if (res.ok) {
       const data = await res.json();
       setAlbums(data);
@@ -32,6 +32,7 @@ export default function AdminAlbumsList() {
     setCreating(true);
     try {
       const res = await fetch("/api/albums", {
+        credentials: "include",
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title: newTitle.trim() }),

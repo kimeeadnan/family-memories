@@ -1,19 +1,25 @@
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
-let _supabase: SupabaseClient | null = null;
+let _client: SupabaseClient | null = null;
+let _fingerprint = "";
 
-function getSupabase(): SupabaseClient {
-  if (_supabase) return _supabase;
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  // During builds we might not have env vars, but we still want `next build` to typecheck.
-  // If someone actually hits an API without proper env, Supabase calls will fail at runtime.
+/**
+ * Real Supabase only — never cache a dummy client (that broke album API after cold starts).
+ */
+export function getSupabase(): SupabaseClient {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
   if (!url || !key) {
-    _supabase = createClient("https://example.supabase.co", "public-anon-key");
-    return _supabase;
+    throw new Error(
+      "Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY in Vercel env"
+    );
   }
-  _supabase = createClient(url, key);
-  return _supabase;
+  const fp = `${url}::${key.length}`;
+  if (!_client || _fingerprint !== fp) {
+    _client = createClient(url, key);
+    _fingerprint = fp;
+  }
+  return _client;
 }
 
 export const supabase = new Proxy({} as SupabaseClient, {
@@ -21,3 +27,9 @@ export const supabase = new Proxy({} as SupabaseClient, {
     return (getSupabase() as any)[prop as any];
   },
 }) as unknown as SupabaseClient;
+
+export function supabaseConfigured(): boolean {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
+  return Boolean(url && key && key.length > 20);
+}

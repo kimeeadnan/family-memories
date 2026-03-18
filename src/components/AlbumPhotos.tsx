@@ -15,8 +15,12 @@ export default function AlbumPhotos({ albumId }: Props) {
   useEffect(() => {
     let cancelled = false;
     Promise.all([
-      fetch(`/api/albums/${albumId}`).then((r) => (r.ok ? r.json() : null)),
-      fetch(`/api/albums/${albumId}/photos`).then((r) => (r.ok ? r.json() : [])),
+      fetch(`/api/albums/${albumId}`, { credentials: "include" }).then((r) =>
+        r.ok ? r.json() : null
+      ),
+      fetch(`/api/albums/${albumId}/photos`, { credentials: "include" }).then(
+        (r) => (r.ok ? r.json() : [])
+      ),
     ]).then(([albumData, photosData]) => {
       if (cancelled) return;
       setAlbum(albumData);

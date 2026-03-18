@@ -67,6 +67,10 @@ function plainPasswordMatches(
   envName: "FAMILY_PASSWORD" | "ADMIN_PASSWORD"
 ): boolean {
   const expected = normalizePlainEnv(process.env[envName]);
+  return plainMatchesInput(input, expected);
+}
+
+function plainMatchesInput(input: string, expected: string): boolean {
   if (expected === "") return false;
   const got = input.trim();
   const a = Buffer.from(got, "utf8");
@@ -79,12 +83,21 @@ function plainPasswordMatches(
   }
 }
 
+/** Admin plain password: ADMIN_PASSWORD or ADMIN_PASS (Vercel typos). */
+export function adminPlainFromEnv(): string {
+  return (
+    normalizePlainEnv(process.env.ADMIN_PASSWORD) ||
+    normalizePlainEnv(process.env.ADMIN_PASS) ||
+    ""
+  );
+}
+
 /** True if server will accept plain-password login (for diagnostics). */
 export function envHasPlainFamilyPassword(): boolean {
   return normalizePlainEnv(process.env.FAMILY_PASSWORD) !== "";
 }
 export function envHasPlainAdminPassword(): boolean {
-  return normalizePlainEnv(process.env.ADMIN_PASSWORD) !== "";
+  return adminPlainFromEnv() !== "";
 }
 
 export async function verifyFamilyPassword(password: string): Promise<boolean> {
@@ -98,7 +111,7 @@ export async function verifyFamilyPassword(password: string): Promise<boolean> {
 }
 
 export async function verifyAdminPassword(password: string): Promise<boolean> {
-  if (plainPasswordMatches(password, "ADMIN_PASSWORD")) return true;
+  if (plainMatchesInput(password, adminPlainFromEnv())) return true;
   const hash = bcryptHashFromEnv(
     "ADMIN_PASSWORD_HASH_B64",
     "ADMIN_PASSWORD_HASH"
