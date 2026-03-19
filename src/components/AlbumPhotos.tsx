@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import AlbumBookView from "./AlbumBookView";
 import AlbumSlideshow from "./AlbumSlideshow";
@@ -10,6 +10,11 @@ import PhotoGrid, { type PhotoItem } from "./PhotoGrid";
 type Props = { albumId: string };
 
 export default function AlbumPhotos({ albumId }: Props) {
+  const VIEW_KEY = useMemo(
+    () => "family_memories_album_view:" + String(albumId ?? ""),
+    [albumId]
+  );
+
   const [album, setAlbum] = useState<{ id: string; title: string } | null>(
     null
   );
@@ -17,32 +22,57 @@ export default function AlbumPhotos({ albumId }: Props) {
   const [view, setView] = useState<"slideshow" | "grid" | "book">("slideshow");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [retrying, setRetrying] = useState(false);
+
+  const loadAlbumPhotos = useCallback(async () => {
+    setError("");
+    setRetrying(true);
+    try {
+      const [albumRes, photosRes] = await Promise.all([
+        fetch(`/api/albums/${albumId}`, { credentials: "include" }),
+        fetch(`/api/albums/${albumId}/photos`, { credentials: "include" }),
+      ]);
+
+      const albumData = albumRes.ok
+        ? ((await albumRes.json()) as { id: string; title: string })
+        : null;
+      const photosData = photosRes.ok
+        ? ((await photosRes.json()) as PhotoItem[])
+        : [];
+
+      setAlbum(albumData);
+      setPhotos(Array.isArray(photosData) ? photosData : []);
+    } catch {
+      setError("Could not load album");
+    } finally {
+      setRetrying(false);
+      setLoading(false);
+    }
+  }, [albumId]);
 
   useEffect(() => {
-    let cancelled = false;
-    Promise.all([
-      fetch(`/api/albums/${albumId}`, { credentials: "include" }).then(
-        (r) => (r.ok ? r.json() : null)
-      ),
-      fetch(`/api/albums/${albumId}/photos`, { credentials: "include" }).then(
-        (r) => (r.ok ? r.json() : [])
-      ),
-    ])
-      .then(([albumData, photosData]) => {
-        if (cancelled) return;
-        setAlbum(albumData);
-        setPhotos(Array.isArray(photosData) ? photosData : []);
-      })
-      .catch(() => {
-        if (!cancelled) setError("Could not load album");
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [albumId]);
+    try {
+      const saved = sessionStorage.getItem(VIEW_KEY);
+      if (saved === "slideshow" || saved === "grid" || saved === "book") {
+        setView(saved);
+      }
+    } catch {
+      /* ignore */
+    }
+  }, [VIEW_KEY]);
+
+  useEffect(() => {
+    setLoading(true);
+    void loadAlbumPhotos();
+  }, [albumId, loadAlbumPhotos]);
+
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(VIEW_KEY, view);
+    } catch {
+      /* ignore */
+    }
+  }, [VIEW_KEY, view]);
 
   if (loading) {
     return (
@@ -61,6 +91,16 @@ export default function AlbumPhotos({ albumId }: Props) {
         >
           ← Back to albums
         </Link>
+        <div className="mt-5">
+          <button
+            type="button"
+            onClick={() => void loadAlbumPhotos()}
+            disabled={retrying}
+            className="rounded-full border border-champagne-400/20 bg-midnight-900/30 px-5 py-2 text-sm text-mist-100 shadow-glass transition hover:border-champagne-400/30 hover:bg-midnight-900/50 disabled:opacity-50"
+          >
+            {retrying ? "Retrying…" : "Retry"}
+          </button>
+        </div>
       </div>
     );
   }
@@ -78,6 +118,9 @@ export default function AlbumPhotos({ albumId }: Props) {
           {album.title}
         </h1>
         <div className="rule-gold mt-5 !mx-0 w-24" />
+        <p className="mt-4 text-center text-xs text-mist-500">
+          New UI bits are still under development, hehe.
+        </p>
 
         <div className="mt-6 flex flex-wrap items-center gap-3">
           <button

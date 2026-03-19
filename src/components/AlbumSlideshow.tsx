@@ -150,6 +150,7 @@ export default function AlbumSlideshow({ photos }: Props) {
                 type="button"
                 onClick={() => setFramePersist(opt.id)}
                 title={opt.hint}
+                aria-pressed={frame === opt.id}
                 className={`rounded-full px-3 py-1.5 text-xs font-medium transition sm:px-4 sm:text-sm ${
                   frame === opt.id
                     ? "bg-regal-600/90 text-midnight-950 shadow-sm"
@@ -186,6 +187,10 @@ export default function AlbumSlideshow({ photos }: Props) {
         {
           SLIDESHOW_FRAME_OPTIONS.find((o) => o.id === frame)?.hint
         }
+      </p>
+      <p className="mb-4 text-[11px] text-mist-500">
+        Export downloads the <span className="text-mist-200">full framed slide</span>{" "}
+        (frame + caption). Some photos may block export due to CORS.
       </p>
 
       {/* Swipeable slideshow */}

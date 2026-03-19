@@ -15,6 +15,7 @@ export default function AdminAlbumsList() {
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [reordering, setReordering] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [newTitle, setNewTitle] = useState("");
   const [error, setError] = useState("");
 
@@ -81,6 +82,7 @@ export default function AdminAlbumsList() {
     );
     if (!ok) return;
     setError("");
+    setDeletingId(album.id);
     try {
       const res = await fetch(`/api/albums/${album.id}`, {
         credentials: "include",
@@ -94,6 +96,8 @@ export default function AdminAlbumsList() {
       await loadAlbums();
     } catch {
       setError("Something went wrong");
+    } finally {
+      setDeletingId(null);
     }
   }
 
@@ -206,9 +210,10 @@ export default function AdminAlbumsList() {
                 <button
                   type="button"
                   onClick={() => void handleDelete(album)}
-                  className="rounded-lg border border-red-500/25 bg-red-950/30 px-2 py-1.5 text-xs font-medium text-red-200/90 transition hover:border-red-400/40 hover:bg-red-900/40"
+                  disabled={deletingId === album.id}
+                  className="rounded-lg border border-red-500/25 bg-red-950/30 px-2 py-1.5 text-xs font-medium text-red-200/90 transition hover:border-red-400/40 hover:bg-red-900/40 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  Delete
+                  {deletingId === album.id ? "Deleting…" : "Delete"}
                 </button>
               </div>
             </div>

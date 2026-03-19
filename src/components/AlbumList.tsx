@@ -18,6 +18,9 @@ export default function AlbumList() {
       const saved = sessionStorage.getItem(VIEW_KEY);
       if (saved === "list" || saved === "stack") {
         setView(saved);
+      } else {
+        // Mobile: swipe stack feels more natural. Desktop: show list grid.
+        setView(window.innerWidth >= 640 ? "list" : "stack");
       }
     } catch {
       /* ignore */

@@ -4,6 +4,7 @@ import { useState } from "react";
 
 export default function LoginForm() {
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -74,7 +75,7 @@ export default function LoginForm() {
             </label>
             <input
               id="family-pw"
-              type="password"
+              type={showPassword ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
@@ -82,6 +83,18 @@ export default function LoginForm() {
               required
               autoFocus
             />
+            <div className="mt-2 flex items-center justify-between gap-3">
+              <span className="text-xs text-mist-500/80">
+                Family only — no admin access.
+              </span>
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                className="rounded-lg border border-champagne-400/20 bg-midnight-900/40 px-3 py-2 text-xs font-medium text-mist-100 transition hover:bg-midnight-900/60"
+              >
+                {showPassword ? "Hide" : "Show"}
+              </button>
+            </div>
           </div>
           {error && (
             <p className="text-center text-sm text-red-400/90">{error}</p>
