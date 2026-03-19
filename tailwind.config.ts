@@ -12,6 +12,7 @@ const config: Config = {
         display: ["var(--font-display)", "Georgia", "serif"],
         sans: ["var(--font-body)", "system-ui", "sans-serif"],
         marker: ["var(--font-marker)", "cursive", "sans-serif"],
+        pencil: ["var(--font-pencil)", "cursive", "sans-serif"],
       },
       colors: {
         midnight: {

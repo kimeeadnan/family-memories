@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import {
+  Caveat,
   Permanent_Marker,
   Playfair_Display,
   Source_Sans_3,
@@ -25,6 +26,13 @@ const markerFont = Permanent_Marker({
   weight: "400",
 });
 
+/** Book photo captions — flowing handwritten (Caveat) */
+const handwritingFont = Caveat({
+  subsets: ["latin"],
+  variable: "--font-pencil",
+  weight: ["500", "600", "700"],
+});
+
 export const metadata: Metadata = {
   title: "Family Memories",
   description: "Our family photo albums",
@@ -38,7 +46,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${display.variable} ${bodyFont.variable} ${markerFont.variable}`}
+      className={`${display.variable} ${bodyFont.variable} ${markerFont.variable} ${handwritingFont.variable}`}
     >
       <body className="relative min-h-screen">
         <AppBackground />

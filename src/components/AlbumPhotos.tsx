@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import AlbumBookView from "./AlbumBookView";
 import AlbumSlideshow from "./AlbumSlideshow";
 import FamilyTreeModal from "./FamilyTreeModal";
 import PhotoGrid, { type PhotoItem } from "./PhotoGrid";
@@ -13,7 +14,7 @@ export default function AlbumPhotos({ albumId }: Props) {
     null
   );
   const [photos, setPhotos] = useState<PhotoItem[]>([]);
-  const [view, setView] = useState<"slideshow" | "grid">("slideshow");
+  const [view, setView] = useState<"slideshow" | "grid" | "book">("slideshow");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -103,6 +104,19 @@ export default function AlbumPhotos({ albumId }: Props) {
           >
             View entire album
           </button>
+          <button
+            type="button"
+            onClick={() => setView("book")}
+            className={[
+              "rounded-full border px-4 py-2 text-sm transition",
+              "border-champagne-400/20 bg-midnight-900/30 text-mist-100 shadow-glass hover:border-champagne-400/30 hover:bg-midnight-900/50",
+              view === "book"
+                ? "border-champagne-400/45 bg-midnight-900/60"
+                : "opacity-90",
+            ].join(" ")}
+          >
+            Book
+          </button>
           <Link
             href="/gallery"
             className="ml-auto text-sm text-mist-200 hover:text-mist-100"
@@ -112,7 +126,13 @@ export default function AlbumPhotos({ albumId }: Props) {
         </div>
       </div>
 
-      {view === "grid" ? <PhotoGrid photos={photos} /> : <AlbumSlideshow photos={photos} />}
+      {view === "grid" ? (
+        <PhotoGrid photos={photos} />
+      ) : view === "book" ? (
+        <AlbumBookView photos={photos} albumTitle={album.title ?? "Album"} />
+      ) : (
+        <AlbumSlideshow photos={photos} />
+      )}
     </div>
   );
 }

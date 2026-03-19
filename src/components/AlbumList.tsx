@@ -2,11 +2,9 @@
 
 import { useEffect, useState } from "react";
 import AlbumCard, { type Album } from "./AlbumCard";
-import type { PhotoItem } from "./PhotoGrid";
 
 export default function AlbumList() {
   const [albums, setAlbums] = useState<Album[]>([]);
-  const [covers, setCovers] = useState<Record<string, string | null>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -30,19 +28,6 @@ export default function AlbumList() {
         }
         const data = body;
         if (!cancelled) setAlbums(Array.isArray(data) ? data : []);
-        (Array.isArray(data) ? data : []).forEach((a: Album) => {
-          fetch(`/api/albums/${a.id}/photos`, { credentials: "include" })
-            .then((r) => (r.ok ? r.json() : []))
-            .then((photos: PhotoItem[]) => {
-              if (cancelled) return;
-              const first = photos.find((p) => p.url);
-              setCovers((prev) => ({
-                ...prev,
-                [a.id]: first?.url ?? null,
-              }));
-            })
-            .catch(() => {});
-        });
       } catch {
         if (!cancelled) setError("Something went wrong");
       } finally {
@@ -85,14 +70,9 @@ export default function AlbumList() {
   }
 
   return (
-    <div className="mx-auto grid max-w-4xl grid-cols-1 gap-8 sm:grid-cols-2">
+    <div className="mx-auto grid max-w-4xl grid-cols-1 gap-10 sm:grid-cols-2 sm:gap-12">
       {albums.map((album, i) => (
-        <AlbumCard
-          key={album.id}
-          album={album}
-          index={i}
-          coverUrl={covers[album.id]}
-        />
+        <AlbumCard key={album.id} album={album} index={i} />
       ))}
     </div>
   );
