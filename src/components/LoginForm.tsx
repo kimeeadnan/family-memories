@@ -23,6 +23,11 @@ export default function LoginForm() {
         setError(data.error || "Invalid password");
         return;
       }
+      try {
+        sessionStorage.setItem("family_memories_welcome_music", "1");
+      } catch {
+        /* private mode / blocked storage */
+      }
       window.location.href = "/gallery";
     } catch {
       setError("Something went wrong");
