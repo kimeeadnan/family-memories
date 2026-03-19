@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { PhotoItem } from "./PhotoGrid";
 
@@ -46,22 +46,44 @@ export default function AlbumBookView({ photos, albumTitle }: Props) {
 
   const [open, setOpen] = useState(false);
   const [spread, setSpread] = useState(0);
+  const [turnDir, setTurnDir] = useState<-1 | 1>(1);
+  const [turning, setTurning] = useState(false);
+  const [turnAnimKey, setTurnAnimKey] = useState(0);
 
   const spreads = spreadCountFor(n);
+
+  const spreadRef = useRef(0);
+  const turnTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
     setSpread(0);
   }, [n]);
 
+  useEffect(() => {
+    spreadRef.current = spread;
+  }, [spread]);
+
   const go = useCallback(
     (d: -1 | 1) => {
-      setSpread((prev) => {
-        const next = prev + d;
-        if (next < 0 || next >= spreads) return prev;
-        return next;
-      });
+      if (!open) return;
+      if (turning) return;
+
+      const next = spreadRef.current + d;
+      if (next < 0 || next >= spreads) return;
+
+      setTurnDir(d);
+      setTurning(true);
+      setTurnAnimKey((k) => k + 1);
+      setSpread(next);
+
+      if (turnTimeoutRef.current) {
+        window.clearTimeout(turnTimeoutRef.current);
+      }
+      turnTimeoutRef.current = window.setTimeout(() => {
+        setTurning(false);
+      }, 520);
     },
-    [spreads]
+    [open, spreads, turning]
   );
 
   useEffect(() => {
@@ -73,6 +95,14 @@ export default function AlbumBookView({ photos, albumTitle }: Props) {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [open, go]);
+
+  useEffect(() => {
+    return () => {
+      if (turnTimeoutRef.current) {
+        window.clearTimeout(turnTimeoutRef.current);
+      }
+    };
+  }, []);
 
   if (!n) {
     return (
@@ -109,8 +139,19 @@ export default function AlbumBookView({ photos, albumTitle }: Props) {
         <div className="space-y-6">
           <div
             key={spread}
-            className="mx-auto max-w-md animate-fade-in overflow-hidden rounded-lg border border-champagne-500/20 bg-midnight-950/30 shadow-[0_20px_50px_rgba(0,0,0,0.45)]"
+            className="book-spread-stage mx-auto max-w-md animate-fade-in overflow-hidden rounded-lg border border-champagne-500/20 bg-midnight-950/30 shadow-[0_20px_50px_rgba(0,0,0,0.45)]"
           >
+            {turning ? (
+              <div
+                key={turnAnimKey}
+                className={[
+                  "book-page-turn-overlay",
+                  turnDir === 1 ? "book-page-turn-next" : "book-page-turn-prev",
+                ].join(" ")}
+                aria-hidden
+              />
+            ) : null}
+
             {/* Stacked spread: top page */}
             <div className="album-book-page min-h-[200px] border-b border-[#b8a690]/35 p-6 sm:min-h-[220px] sm:p-8">
               <div className="relative z-[1]">
