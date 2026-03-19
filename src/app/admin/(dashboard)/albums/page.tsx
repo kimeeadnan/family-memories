@@ -17,7 +17,9 @@ export default function AdminAlbumsPage() {
           Manage albums
         </h1>
         <p className="mt-2 text-sm text-mist-400">
-          Create a new album, then open it to add photos.
+          Create albums, reorder with ↑ ↓ (same order appears in the family
+          gallery), open one to add photos, or delete an album and all its
+          photos.
         </p>
         <div className="rule-gold mt-6 !mx-0 w-16" />
         <div className="mt-10">

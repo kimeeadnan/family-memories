@@ -24,7 +24,7 @@ Optional (if you use hashes instead of plain): `FAMILY_PASSWORD_HASH_B64`, `ADMI
 
 ## Supabase (for albums)
 
-1. SQL Editor: run `supabase/migrations/001_albums_photos.sql`
+1. SQL Editor: run `supabase/migrations/001_albums_photos.sql`, then `002_album_sort_order.sql`
 2. Storage: bucket name **`memories`** (private)
 
 ## Still broken?

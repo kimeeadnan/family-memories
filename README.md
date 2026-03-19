@@ -5,7 +5,7 @@ A web-based family photo album app. Share one link (or QR code) with your family
 ## Features
 
 - **Family view**: One link → enter password → browse albums (e.g. Raya 2024, Family Day 2025) → tap an album → masonry photo grid with full-screen lightbox (swipe on mobile).
-- **Admin**: Create albums, upload multiple photos per album. Password-protected; only you use it.
+- **Admin**: Create albums, reorder them, delete albums (and storage files), upload multiple photos per album. Password-protected; only you use it.
 - **Light blue theme**, mobile-first, interactive (animations, hover states).
 
 ## Tech stack
@@ -19,8 +19,9 @@ A web-based family photo album app. Share one link (or QR code) with your family
 ### 1. Supabase
 
 1. Create a project at [supabase.com](https://supabase.com).
-2. In the SQL Editor, run the migration:
-   - Copy the contents of `supabase/migrations/001_albums_photos.sql` and run it.
+2. In the SQL Editor, run the migrations (in order):
+   - `supabase/migrations/001_albums_photos.sql`
+   - `supabase/migrations/002_album_sort_order.sql` (album order + admin reorder)
 3. Create a Storage bucket:
    - Go to Storage → New bucket.
    - Name: `memories`.

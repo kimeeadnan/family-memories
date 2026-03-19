@@ -6,6 +6,7 @@ export type Album = {
   id: string;
   title: string;
   created_at: string;
+  sort_order?: number;
 };
 
 type Props = {

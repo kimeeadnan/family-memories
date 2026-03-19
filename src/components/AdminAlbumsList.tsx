@@ -1,29 +1,101 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 
-type Album = { id: string; title: string; created_at: string };
+type Album = {
+  id: string;
+  title: string;
+  created_at: string;
+  sort_order?: number;
+};
 
 export default function AdminAlbumsList() {
   const [albums, setAlbums] = useState<Album[]>([]);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
+  const [reordering, setReordering] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [error, setError] = useState("");
 
-  async function loadAlbums() {
+  const loadAlbums = useCallback(async () => {
     const res = await fetch("/api/albums", { credentials: "include" });
     if (res.ok) {
       const data = await res.json();
-      setAlbums(data);
+      setAlbums(Array.isArray(data) ? data : []);
     }
     setLoading(false);
-  }
+  }, []);
 
   useEffect(() => {
     loadAlbums();
-  }, []);
+  }, [loadAlbums]);
+
+  async function persistOrder(next: Album[]) {
+    const previous = [...albums];
+    setAlbums(next);
+    setReordering(true);
+    setError("");
+    try {
+      const res = await fetch("/api/albums", {
+        credentials: "include",
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ albumIds: next.map((a) => a.id) }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        const hint =
+          data.code === "NEEDS_MIGRATION_002"
+            ? " Run supabase/migrations/002_album_sort_order.sql in Supabase SQL Editor."
+            : "";
+        setError((data.error || "Could not save order") + hint);
+        setAlbums(previous);
+        return;
+      }
+    } catch {
+      setError("Could not save order");
+      setAlbums(previous);
+    } finally {
+      setReordering(false);
+    }
+  }
+
+  function moveUp(index: number) {
+    if (index <= 0) return;
+    const next = [...albums];
+    [next[index - 1], next[index]] = [next[index], next[index - 1]];
+    void persistOrder(next);
+  }
+
+  function moveDown(index: number) {
+    if (index >= albums.length - 1) return;
+    const next = [...albums];
+    [next[index], next[index + 1]] = [next[index + 1], next[index]];
+    void persistOrder(next);
+  }
+
+  async function handleDelete(album: Album) {
+    const ok = window.confirm(
+      `Delete “${album.title}” and all photos in it? This cannot be undone.`
+    );
+    if (!ok) return;
+    setError("");
+    try {
+      const res = await fetch(`/api/albums/${album.id}`, {
+        credentials: "include",
+        method: "DELETE",
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setError(data.error || "Failed to delete album");
+        return;
+      }
+      await loadAlbums();
+    } catch {
+      setError("Something went wrong");
+    }
+  }
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
@@ -90,18 +162,56 @@ export default function AdminAlbumsList() {
         </button>
       </form>
       {error && <p className="text-sm text-red-400">{error}</p>}
+      {reordering && (
+        <p className="text-xs text-mist-500" role="status">
+          Saving order…
+        </p>
+      )}
       <ul className="space-y-3">
-        {albums.map((album) => (
+        {albums.map((album, index) => (
           <li key={album.id}>
-            <Link
-              href={`/admin/albums/${album.id}`}
-              className="block rounded-xl border border-champagne-400/15 bg-midnight-850/40 p-5 font-medium text-mist-100 transition hover:border-champagne-400/30 hover:bg-midnight-800/50"
-            >
-              {album.title}
-              <span className="mt-1 block text-xs font-normal text-mist-500">
-                Upload photos →
-              </span>
-            </Link>
+            <div className="flex gap-2 rounded-xl border border-champagne-400/15 bg-midnight-850/40 p-2 sm:p-3">
+              <Link
+                href={`/admin/albums/${album.id}`}
+                className="min-w-0 flex-1 rounded-lg px-3 py-3 font-medium text-mist-100 transition hover:bg-midnight-800/50"
+              >
+                {album.title}
+                <span className="mt-1 block text-xs font-normal text-mist-500">
+                  Upload photos →
+                </span>
+              </Link>
+              <div className="flex shrink-0 flex-col justify-center gap-1 border-l border-champagne-400/10 pl-2">
+                <div className="flex gap-1">
+                  <button
+                    type="button"
+                    onClick={() => moveUp(index)}
+                    disabled={index === 0 || reordering}
+                    className="rounded-lg border border-champagne-400/20 bg-midnight-950/60 px-2 py-1.5 text-sm text-mist-200 transition hover:border-champagne-400/35 hover:bg-midnight-800/60 disabled:cursor-not-allowed disabled:opacity-30"
+                    aria-label={`Move “${album.title}” up`}
+                    title="Move up"
+                  >
+                    ↑
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => moveDown(index)}
+                    disabled={index === albums.length - 1 || reordering}
+                    className="rounded-lg border border-champagne-400/20 bg-midnight-950/60 px-2 py-1.5 text-sm text-mist-200 transition hover:border-champagne-400/35 hover:bg-midnight-800/60 disabled:cursor-not-allowed disabled:opacity-30"
+                    aria-label={`Move “${album.title}” down`}
+                    title="Move down"
+                  >
+                    ↓
+                  </button>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => void handleDelete(album)}
+                  className="rounded-lg border border-red-500/25 bg-red-950/30 px-2 py-1.5 text-xs font-medium text-red-200/90 transition hover:border-red-400/40 hover:bg-red-900/40"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
           </li>
         ))}
       </ul>
