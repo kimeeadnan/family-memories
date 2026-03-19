@@ -2,11 +2,36 @@
 
 import { useEffect, useState } from "react";
 import AlbumCard, { type Album } from "./AlbumCard";
+import AlbumStackViewer from "./AlbumStackViewer";
+
+const VIEW_KEY = "family_memories_album_layout";
+type AlbumView = "stack" | "list";
 
 export default function AlbumList() {
   const [albums, setAlbums] = useState<Album[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [view, setView] = useState<AlbumView>("stack");
+
+  useEffect(() => {
+    try {
+      const saved = sessionStorage.getItem(VIEW_KEY);
+      if (saved === "list" || saved === "stack") {
+        setView(saved);
+      }
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  function setViewPersist(next: AlbumView) {
+    setView(next);
+    try {
+      sessionStorage.setItem(VIEW_KEY, next);
+    } catch {
+      /* ignore */
+    }
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -70,10 +95,46 @@ export default function AlbumList() {
   }
 
   return (
-    <div className="mx-auto grid max-w-4xl grid-cols-1 gap-10 sm:grid-cols-2 sm:gap-12">
-      {albums.map((album, i) => (
-        <AlbumCard key={album.id} album={album} index={i} />
-      ))}
+    <div className="mx-auto max-w-4xl">
+      <div className="mb-10 flex flex-wrap items-center justify-center gap-3 sm:justify-end">
+        <span className="w-full text-center text-[10px] uppercase tracking-[0.2em] text-mist-500 sm:w-auto sm:text-left">
+          View
+        </span>
+        <div className="flex rounded-xl border border-champagne-400/20 bg-midnight-950/50 p-1 shadow-inner">
+          <button
+            type="button"
+            onClick={() => setViewPersist("stack")}
+            className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
+              view === "stack"
+                ? "bg-regal-600/90 text-midnight-950 shadow-sm"
+                : "text-mist-400 hover:text-mist-200"
+            }`}
+          >
+            Swipe cards
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewPersist("list")}
+            className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
+              view === "list"
+                ? "bg-regal-600/90 text-midnight-950 shadow-sm"
+                : "text-mist-400 hover:text-mist-200"
+            }`}
+          >
+            List
+          </button>
+        </div>
+      </div>
+
+      {view === "stack" ? (
+        <AlbumStackViewer albums={albums} />
+      ) : (
+        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 sm:gap-12">
+          {albums.map((album, i) => (
+            <AlbumCard key={album.id} album={album} index={i} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
